@@ -5,12 +5,14 @@ model User {
   password     String       @db.VarChar(255)
   activeStatus ActiveStatus @default(ACTIVE)
   role         Role         @default(USER)
+  profile      Profile?
+  subscriptions Subscription?
+
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-  profile      Profile?
+  
+  comments      Comment[]
+  posts         Post[]
 
-  comments Comment[]
-  posts    Post[]
-
-  @@map("users")
+  @@map("user") //database table name
 }

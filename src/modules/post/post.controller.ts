@@ -28,8 +28,9 @@ const getAllPosts = catchAsync(async (req: Request, res: Response) => {
         success: true,
         statusCode: httpStatus.OK,
         message: "Posts fetched successfully",
-        total: result.length,
-        data: result,
+        total: result.data.length,
+        data: result.data,
+        meta: result.meta,
     });
 });
 

@@ -4,6 +4,20 @@ import { prisma } from "../../lib/prisma";
 import { ICreatePostPayload, IPostQuery, IUpdatePayload } from "./post.interface"
 
 const createPostIntoDB = async (payload: ICreatePostPayload, userId: string) => {
+
+    const user = await prisma.user.findUniqueOrThrow({
+        where: {
+            id: userId
+        },
+        include: {
+            subscriptions: true
+        }
+    });
+
+    if(payload.isPeremium && user.subscriptions?.status !== "ACTIVE") {
+        throw new Error("You are not subscribed to create premium post");
+    }
+
     const result = await prisma.post.create({
         data: {
             ...payload,
@@ -86,6 +100,10 @@ const getAllPostsFromDB = async (query: IPostQuery) => {
         })
     }
 
+    andCondition.push({
+        isPeremium: false
+    })
+
     const result = await prisma.post.findMany({
         // where: {
         //     AND: [
@@ -134,7 +152,21 @@ const getAllPostsFromDB = async (query: IPostQuery) => {
         }
     });
 
-    return result;
+    const totalPostCount = await prisma.post.count({
+        where: {
+            AND: andCondition
+        }
+    });
+
+    return {
+        data: result,
+        meta: {
+            page: page,
+            limit: limit,
+            total: totalPostCount,
+            totalPages: Math.ceil(totalPostCount / limit)
+        }
+    };
 }
 
 const getPostByIdFromDB = async (postId: string) => {
@@ -143,7 +175,8 @@ const getPostByIdFromDB = async (postId: string) => {
         async (tx) => {
             await tx.post.update({
                 where: {
-                    id: postId
+                    id: postId,
+                    isPeremium: false
                 },
                 data: {
                     views: {

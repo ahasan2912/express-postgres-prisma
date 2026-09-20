@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../../lib/prisma";
 import { LoadingPayload } from "./auth.interface";
-import jwt, { SignOptions } from "jsonwebtoken";
+import { SignOptions } from "jsonwebtoken";
 import config from "../../config";
 import { jwtUtils } from "../../utils/jwt";
 
@@ -50,8 +50,24 @@ const loginIntoDB = async (payload: LoadingPayload) => {
     } as SignOptions,
     );
 
-    const { password: _, ...userWithoutPassword } = user;
-    return { ...userWithoutPassword, accessToken, refreshToken };
+    // const { password: _, ...userWithoutPassword } = user;
+    // return { ...userWithoutPassword, accessToken, refreshToken };
+
+    const result = await prisma.user.findUnique({
+        where: {
+            email,
+        },
+        omit: {
+            password: true,
+        },
+    });
+
+    if (!result) {
+        throw new Error("User not found");
+    }
+
+    return { ...result, accessToken, refreshToken };
+
 }
 
 const refreshToken = async (token: string) => {

@@ -1,7 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import httpStatus from "http-status";
 
-// catchAsync is a higher-order function that takes an asynchronous function (fn) as an argument and returns a new function. Here catchAsync return request and response. 
+// catchAsync is a higher-order function that takes an asynchronous function (fn) as an argument and returns a new function. Here catchAsync return request and response and next.
 export const catchAsync = (fn: RequestHandler) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
