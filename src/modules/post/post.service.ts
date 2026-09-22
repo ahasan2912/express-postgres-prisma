@@ -105,31 +105,8 @@ const getAllPostsFromDB = async (query: IPostQuery) => {
     })
 
     const result = await prisma.post.findMany({
-        // where: {
-        //     AND: [
-        //         query.searchTerm ? {
-        //             OR: [
-        //                 {
-        //                     title: {
-        //                         contains: query.searchTerm,
-        //                         mode: "insensitive"
-        //                     }
-        //                 },
-        //                 {
-        //                     content: {
-        //                         contains: query.searchTerm,
-        //                         mode: "insensitive"
-        //                     }
-        //                 }
-        //             ]
-        //         } : {},
-        //         query.title ? { title: query.title } : {},
-        //         query.content ? { content: query.content } : {},
-        //     ]
-        // },
 
         //pagination
-
         where: {
             AND: andCondition
         },
